@@ -1,8 +1,22 @@
-import os
+from OpenGL.GL import glCallList, glClear, glClearColor, glColorMaterial, glCullFace, glDepthFunc, glDisable, glEnable,\
+                      glFlush, glGetFloatv, glLightfv, glLoadIdentity, glMatrixMode, glMultMatrixf, glPopMatrix, \
+                      glPushMatrix, glTranslated, glViewport, \
+                      GL_AMBIENT_AND_DIFFUSE, GL_BACK, GL_CULL_FACE, GL_COLOR_BUFFER_BIT, GL_COLOR_MATERIAL, \
+                      GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST, GL_FRONT_AND_BACK, GL_LESS, GL_LIGHT0, GL_LIGHTING, \
+                      GL_MODELVIEW, GL_MODELVIEW_MATRIX, GL_POSITION, GL_PROJECTION, GL_SPOT_DIRECTION
+from OpenGL.constants import GLfloat_3, GLfloat_4
+from OpenGL.GLU import gluPerspective, gluUnProject
+from OpenGL.GLUT import glutCreateWindow, glutDisplayFunc, glutGet, glutInit, glutInitDisplayMode, \
+                        glutInitWindowSize, glutMainLoop, \
+                        GLUT_SINGLE, GLUT_RGB, GLUT_WINDOW_HEIGHT, GLUT_WINDOW_WIDTH
+
 import numpy
-from OpenGL.GL import *
-from OpenGL.GLUT import *
-from OpenGL.GLU import *
+from numpy.linalg import norm, inv
+
+
+
+
+
 
 
 class Viewer(object):
@@ -29,7 +43,8 @@ class Viewer(object):
 
         glEnable(GL_CULL_FACE)
         glCullFace(GL_BACK)
-        glEnable(GL_DEPTH_TEST)
+        # determines how long our object is related relatively to the camera
+        glEnable(GL_DEPTH_TEST) 
         glDepthFunc(GL_LESS)
 
         glEnable(GL_LIGHT0)
@@ -78,8 +93,67 @@ class Viewer(object):
     def render(self):
         """The render passes for the scene"""
         self.init_view()
+        glEnable(GL_LIGHTING)
+    
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+       
+
+        # here i will create modelview matrix
+        glMatrixMode(GL_MODELVIEW_MATRIX)
+        glPushMatrix() 
+        glLoadIdentity()
+        locOfCamera = self.interaction.translation 
+
+        # move camera to location
+        glTranslated(locOfCamera [0], locOfCamera [1], locOfCamera[2])
+        # rotation matrix
+        glMultMatrixf(self.interaction.rotation) 
+
+        # store the inverse of modelview matrix
+
+        currModelView = numpy.array(glGetFloatv(GL_MODELVIEW_MATRIX))
+        self.modelView = numpy.transpose(currModelView)
+        self.inverseModelView = inv(numpy.transpose(currModelView))
+
+
+        # render the scene, which will call all objects from render function
+
+        self.scene.render()
+        
+
+
+        # draw the grid-scene
+
+        glDisable(GL_LIGHTING)
+        glCallList(G_OBJ_PLANE)
+        glPopMatrix()
+
+ 
+        # flush the buffer, cuz it allows the scene can be drawn
+        glFlush()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         
+       
 
 
 
@@ -87,7 +161,7 @@ class Viewer(object):
         glutMainLoop()
 
         
-if __name__ == "__main__":
+if __name__ == "__main__": 
     viewer = Viewer()
     viewer.main_loop()
         
