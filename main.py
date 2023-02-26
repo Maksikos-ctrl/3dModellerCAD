@@ -15,6 +15,8 @@ from numpy.linalg import norm, inv
 
 
 
+from scene import Scene
+from primitive import init_primitives, G_OBJ_PLANE
 
 
 
@@ -102,10 +104,10 @@ class Viewer(object):
         glMatrixMode(GL_MODELVIEW_MATRIX)
         glPushMatrix() 
         glLoadIdentity()
-        locOfCamera = self.interaction.translation 
+        loc_of_camera = self.interaction.translation 
 
         # move camera to location
-        glTranslated(locOfCamera [0], locOfCamera [1], locOfCamera[2])
+        glTranslated(loc_of_camera [0], loc_of_camera[1], loc_of_camera[2])
         # rotation matrix
         glMultMatrixf(self.interaction.rotation) 
 
@@ -132,6 +134,25 @@ class Viewer(object):
         # flush the buffer, cuz it allows the scene can be drawn
         glFlush()
 
+
+    def init_view(self):
+        """Init projection matrix"""
+
+        xSize, ySize = glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT)
+        aspect_ratio = float(xSize) / float(ySize)
+
+        # load the projection matrix
+        glMatrixMode(GL_PROJECTION)
+        # we need identity matrix for projection matrix, identity matrix is a matrix with 1 on the diagonal and 0 everywhere else
+        glLoadIdentity()
+
+        glViewport(0, 0, xSize, ySize)
+        gluPerspective(70, aspect_ratio, 0.1, 1000.0)
+        glTranslated(0, 0, -15)
+
+
+
+    
 
 
 
