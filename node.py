@@ -50,6 +50,17 @@ class Node(object):
 
 
 class Primitive(Node):
+    def __init__(self):
+        super(Primitive, self).__init__()
+        self.call_list = None
+
+    def render_self(self):
+        glCallList(self.call_list)
+
+
+
+
+class Sphere(Primitive):
     """pritime of the sphere"""     
 
     def __init__(self):
@@ -60,6 +71,37 @@ class Cube(Primitive):
     """cube of the cube"""
 
     def __init__(self):
+        # super method takes all method from Class
         super(Cube, self).__init__()
         self.call_list = G_OBJ_CUBE
+
+
+class HierarchicalNode(Node):
+    def __init___(self):
+        super(HierarchicalNode, self).__init()
+        self.child_nodes = []
+
+
+    def render_self(self):
+        for child in self.child_nodes:
+            child.render() 
+
+
+class SnowFigure(HierarchicalNode):
+    def __init__(self):
+        super(SnowFigure, self).__init__() # super method takes all method from Class HierarchicalNode and Node 
+        self.child_nodes = [Sphere(), Sphere(), Sphere()]       
+        self.child_nodes[0].translate(0, -0.6, 0)
+        self.child_nodes[1].translate(0, -0.6, 0)
+        self.child_nodes[1].scaling_matrix = numpy.dot(self.scaling_matrix, scaling([0.8, 0.8, 0.8]))
+        self.child_nodes[2].translate(0, 0.75, 0)
+        self.child_nodes[2].scaling_matrix = numpy.dot(self.scaling_matrix, scaling([0.7, 0.7, 0.7]))
+        for child_node in self.child_nodes:
+            child_node.color_indx = self.MIN_COLOR
+
+        self.aabb = AABB([0.0, 0.0, 0.0], [0.5, 1.1, 0.5])    
+
+
+
+
         
