@@ -16,6 +16,7 @@ from numpy.linalg import norm, inv
 
 
 from scene import Scene
+from interaction import Interaction
 from primitive import init_primitives, G_OBJ_PLANE
 
 
