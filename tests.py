@@ -1,6 +1,11 @@
 import unittest 
 from unittest.mock import MagicMock
 from main import Viewer
+from OpenGL.GL import GL_AMBIENT_AND_DIFFUSE, GL_BACK, GL_CULL_FACE, GL_COLOR_MATERIAL, \
+                      GL_DEPTH_TEST, GL_FRONT_AND_BACK, GL_LESS, GL_LIGHT0, \
+                      GL_POSITION, GL_SPOT_DIRECTION
+
+from OpenGL.GLUT import GLUT_SINGLE, GLUT_RGB
 
 class TestViewer(unittest.TestCase):
 

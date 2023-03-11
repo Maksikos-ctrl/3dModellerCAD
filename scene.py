@@ -1,7 +1,7 @@
 import sys
 import numpy
-from node import Sphere, Cube, SnowFigurenowFigure
-from scene import Scene
+from node import Sphere, Cube, SnowFigure
+
 
 
 class Scene(object):
