@@ -40,3 +40,30 @@ This will open a window displaying the 3D scene. You can interact with the scene
     Move: left-click and drag an object to move it
     Scale: right-click and drag an object to scale it
     Rotate: left-click and drag outside an object to r
+
+
+The scene contains basic geometric shapes such as spheres and cubes. You can add more shapes by modifying the node.py file. The transformation.py file contains functions to create transformation matrices such as translation and scaling matrices that can be used to transform the objects in the scene.    
+
+
+`viewer.py`:
+
+    This is the main Python file that launches the 3D model viewer.
+    It creates an instance of the Scene class, which represents the 3D scene containing various geometric shapes.
+    It uses the PyOpenGL library to render the 3D scene onto a window.
+    It defines mouse callback functions for picking, moving, scaling, and rotating the shapes in the scene.
+
+`node.py`:
+
+    This file defines the Node class, which represents a single geometric shape in the 3D scene.
+    It also defines subclasses of Node for specific shapes like spheres, cubes, and snow figures.
+    Each Node has a position, rotation, and scale in 3D space, as well as methods for rendering and picking.
+
+`scene.py`:
+
+    This file defines the Scene class, which represents the entire 3D scene containing multiple Nodes.
+    It provides methods for adding new Nodes to the scene, rendering the scene, picking objects with the mouse, and moving/scaling selected Nodes.
+
+`transformation.py`:
+
+    This file defines two helper functions for creating transformation matrices: translation and scaling.
+    These functions return a 4x4 NumPy matrix representing a translation or scaling operation in 3D space.

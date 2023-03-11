@@ -34,6 +34,18 @@ class Interaction(object):
         glutSpecialFunc(self.handle_keystroke)
 
 
+    def register_callback(self, name, func):
+        self.callbacks[name].append(func)
+
+
+
+    # **kwargs allows us to pass a variable number of keyword arguments to a Python function, creates a dictionary
+    # *args we use where we dunno how much args we wanna pass 
+    def trigger(self, name, *args, **kwargs):  
+        for func in self.callbacks[name]:  
+            func(*args, **kwargs)    
+
+
     def translate(self, x, y, z):
         """apply the current interaction to the modelview matrix"""
 
@@ -69,7 +81,7 @@ class Interaction(object):
         """ Called when the mouse is moved """
 
         xSize, ySize = glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT)
-        # invert the y coordinate because OpenGL is inverted
+        #* invert the y coordinate because OpenGL is inverted
         y = ySize - y;    
 
         if self.pressed is not None:
@@ -107,9 +119,16 @@ class Interaction(object):
             self.trigger('rotate_color', forward=True)
         elif key == GLUT_KEY_RIGHT:
             self.trigger('rotate_color', forward=False)
-        glutPostRedisplay()
+        glutPostRedisplay() 
 
-             
+
+    
+
+
+
+
+    
+          
         
         
 

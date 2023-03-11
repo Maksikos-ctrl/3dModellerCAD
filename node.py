@@ -3,8 +3,12 @@ from OpenGL.GL import glCallList, glColor3f, glMaterialfv, glMultMatrixf, glPopM
                       GL_EMISSION, GL_FRONT
 import numpy
 
-
+from primitive import G_OBJ_CUBE, G_OBJ_SPHERE
+from aabb import AABB
+from transformation import scaling, translation
 import color
+
+
 
 
 ## axis-aligned bounding box aabb
@@ -28,7 +32,7 @@ class Node(object):
         curr_color = color.COLORS[self.color_indx]
         glColor3f(curr_color[0], curr_color[1], curr_color[2])
 
-        # i wanna combine to if self.selcted in one loops, help me to implement it
+        
 
 
         if self.selected:
@@ -41,12 +45,44 @@ class Node(object):
             glMaterialfv(GL_FRONT, GL_EMISSION, [0.0, 0.0, 0.0])
         glPopMatrix()
 
-
-
-
     def render_self(self):
         # raise == throw
         raise NotImplementedError("Unfornunately, the abstract node class doesn't define a render_self method.  You should use a subclass of Node instead.")
+    
+
+    def pick(self, start, dir, mat):
+        """ 
+        Return whether or not the ray hits the object
+
+        Consume:  
+        start, direction form the ray to check
+        mat
+        """
+
+        newmat = numpy.dot(
+            numpy.dot(mat, self.translation_matrix), 
+            numpy.linalg.inv(self.scaling_matrix)
+        )
+        results = self.aabb.ray_hit(start, dir, newmat)
+        return results
+
+
+    def select(self, select=None):
+        """ Toggles or sets selected state """
+
+        if select is not None:
+            self.selected = select
+        else:
+            self.selected = not self.selected    
+
+
+    def rotate_color(self, forwards):
+        self.color_indx += 1 if  forwards else -1
+        if self.color_indx > color.MAX_COLOR:
+            self.color_indx = color.MIN_COLOR
+        if self.color_indx < color.MIN_COLOR:
+            self.color_indx = color.MAX_COLOR  
+
 
 
 class Primitive(Node):
