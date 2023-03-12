@@ -20,6 +20,7 @@ from interaction import Interaction
 from primitive import init_primitives, G_OBJ_PLANE
 from node import Sphere, Cube, SnowFigure
 from scene import Scene
+import color
 
 
 
@@ -35,10 +36,11 @@ class Viewer(object):
     def init_interface(self):
         """ initialize the window and register the render function """
         glutInit()
-        glutInitWindowSize(640, 480)
-        glutCreateWindow("3D Modeller")
+        glutInitWindowSize(1080, 720)
+        glutCreateWindow("Max 3d Modeller")
         glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB)
         glutDisplayFunc(self.render)
+     
 
     def init_opengl(self):
         """ initialize the opengl settings to render the scene """
@@ -76,6 +78,8 @@ class Viewer(object):
         self.scene.add_node(sphere_node)
 
         hierarchical_node = SnowFigure()
+        for child_node in hierarchical_node.child_nodes:
+            child_node.color_indx = color.MIN_COLOR
         hierarchical_node.translate(-2, 0, -2)
         self.scene.add_node(hierarchical_node)
 
@@ -183,7 +187,9 @@ if __name__ == "__main__":
     viewer.main_loop()
 
 
-        
+
+
+  
 
 
 

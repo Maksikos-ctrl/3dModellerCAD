@@ -30,7 +30,7 @@ class Interaction(object):
 
         glutMouseFunc(self.handle_mouse_button)
         glutMotionFunc(self.handle_mouse_move)
-        glutKeyboardFunc(self.handle_kyestroke)
+        glutKeyboardFunc(self.handle_keystroke)
         glutSpecialFunc(self.handle_keystroke)
 
 
@@ -77,35 +77,34 @@ class Interaction(object):
         glutPostRedisplay() # glutPostRedisplay is called when the window is redrawn
 
 
-    def handle_mouse_move(self, x, y, screen_y):
+    def handle_mouse_move(self, x, screen_y):
         """ Called when the mouse is moved """
 
         xSize, ySize = glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT)
         #* invert the y coordinate because OpenGL is inverted
-        y = ySize - y;    
+        y = ySize - screen_y;    
 
         if self.pressed is not None:
             dx = x - self.mouse_loc[0]
             dy = y - self.mouse_loc[1]
 
-            if self.pressed == GLUT_LEFT_BUTTON and self.trackball is not None:
+            if self.pressed == GLUT_RIGHT_BUTTON and self.trackball is not None:
                 self.trackball.drag_to(self.mouse_loc[0], self.mouse_loc[1], dx, dy)
             elif self.pressed == GLUT_LEFT_BUTTON:
                 self.trigger('move', x, y)
             elif self.pressed == GLUT_MIDDLE_BUTTON:
-                self.translate(dx/60.0, dy/60.0)
+                self.translate(dx/60.0, dy/60.0)    
             else:
                 pass        
             glutPostRedisplay()
-        self.mouse_loc = (x, y)   
-
+        self.mouse_loc = (x, y)  
 
     def handle_keystroke(self, key, x, screen_y):
         """ Called when a key is pressed """
 
         xSize, ySize = glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT)
         # invert the y coordinate because OpenGL is inverted
-        y = ySize - y;  
+        y = ySize - screen_y;  
 
         if key == 's':
             self.trigger('place', 'sphere', x, y)

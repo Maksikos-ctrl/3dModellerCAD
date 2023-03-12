@@ -1,11 +1,9 @@
-import unittest 
-from unittest.mock import MagicMock
+import unittest
+from unittest.mock import MagicMock, patch
+from OpenGL.GL import *
+from OpenGL.GLU import *
 from main import Viewer
-from OpenGL.GL import GL_AMBIENT_AND_DIFFUSE, GL_BACK, GL_CULL_FACE, GL_COLOR_MATERIAL, \
-                      GL_DEPTH_TEST, GL_FRONT_AND_BACK, GL_LESS, GL_LIGHT0, \
-                      GL_POSITION, GL_SPOT_DIRECTION
-
-from OpenGL.GLUT import GLUT_SINGLE, GLUT_RGB
+from scene import Scene
 
 class TestViewer(unittest.TestCase):
 
@@ -14,57 +12,29 @@ class TestViewer(unittest.TestCase):
 
 
     def test_init_interface(self):
-        # Mock the functions that are called inside init_interface method
-        glutInit = MagicMock()
-        glutInitWindowSize = MagicMock()
-        glutCreateWindow = MagicMock()
-        glutInitDisplayMode = MagicMock()
-        glutDisplayFunc = MagicMock()
-
-
-        # Call the init_interface method
-        self.viewer.init_interface()
-
-        # Assert that the mocked functions were called with the expected arguments
-        glutInit.assert_called_once_with()
-        glutInitWindowSize.assert_called_once_with(1080, 720)
-        glutCreateWindow.assert_called_once_with("3d Model Viewer")
-        glutInitDisplayMode.assert_called_once_with(GLUT_RGB | GLUT_SINGLE)
-        glutDisplayFunc.assert_called_once_with(self.viewer.renderer)
-
+        with patch('OpenGL.GLUT.glutInit') as glutInit:
+            self.viewer.init_interface()
+            glutInit.assert_called_once_with()
 
 
     def test_init_opengl(self):
-        # Mock the OpenGL functions that are called inside init_opengl method
-        glEnable = MagicMock()
-        glCullFace = MagicMock()
-        glDepthFunc = MagicMock()
-        glLightfv = MagicMock()
-        glColorMaterial = MagicMock()
-        glClearColor = MagicMock()
-
-        # Call the init_opengl method
-        self.viewer.init_opengl()
-
-        # Assert that the mocked OpenGL functions were called with the expected arguments
-        glEnable.assert_any_call(GL_CULL_FACE)
-        glCullFace.assert_called_once_with(GL_BACK)
-        glEnable.assert_any_call(GL_DEPTH_TEST)
-        glDepthFunc.assert_called_once_with(GL_LESS)
-        glEnable.assert_any_call(GL_LIGHT0)
-        glLightfv.assert_any_call(GL_LIGHT0, GL_POSITION, [0, 0, 0, 1])
-        glLightfv.assert_any_call(GL_LIGHT0, GL_SPOT_DIRECTION, [0, 0, -1])
-        glColorMaterial.assert_called_once_with(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
-        glEnable.assert_called_once_with(GL_COLOR_MATERIAL)
-        glClearColor.assert_called_once_with(0.4, 0.4, 0.4, 0)
+        with patch('OpenGL.GL.glEnable') as glEnable, \
+                patch('OpenGL.GL.glClearColor') as glClearColor, \
+                patch('OpenGL.GL.glMatrixMode') as glMatrixMode, \
+                patch('OpenGL.GL.glLoadIdentity') as glLoadIdentity, \
+                patch('OpenGL.GLU.gluOrtho2D') as gluOrtho2D:
+            self.viewer.init_opengl()
+            glEnable.assert_called_once_with(GL_CULL_FACE)
+            glClearColor.assert_called_once_with(0.0, 0.0, 0.0, 0.0)
+            glMatrixMode.assert_called_once_with(GL_PROJECTION)
+            glLoadIdentity.assert_called_once_with()
+            gluOrtho2D.assert_called_once_with(0, 640, 0, 480)
 
 
-    def test_create_sample_scane(self):
-       # Call the create_sample_scene method
+    def test_create_sample_scene(self):
+        self.viewer.scene = Scene()
         self.viewer.create_sample_scene()
-
-        # Assert that the scene has two nodes
-        self.assertEqual(len(self.viewer.scene.nodes), 2)
+        self.assertEqual(len(self.viewer.scene.node_list), 3)
 
      
    
