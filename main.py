@@ -3,7 +3,7 @@ from OpenGL.GL import glCallList, glClear, glClearColor, glColorMaterial, glCull
                       glPushMatrix, glTranslated, glViewport, \
                       GL_AMBIENT_AND_DIFFUSE, GL_BACK, GL_CULL_FACE, GL_COLOR_BUFFER_BIT, GL_COLOR_MATERIAL, \
                       GL_DEPTH_BUFFER_BIT, GL_DEPTH_TEST, GL_FRONT_AND_BACK, GL_LESS, GL_LIGHT0, GL_LIGHTING, \
-                      GL_MODELVIEW, GL_MODELVIEW_MATRIX, GL_POSITION, GL_PROJECTION, GL_SPOT_DIRECTION
+                      GL_MODELVIEW, GL_MODELVIEW_MATRIX, GL_POSITION, GL_PROJECTION, GL_SPOT_DIRECTION, glTranslatef, glRotatef, GL_MODELVIEW
 from OpenGL.constants import GLfloat_3, GLfloat_4
 from OpenGL.GLU import gluPerspective, gluUnProject
 from OpenGL.GLUT import glutCreateWindow, glutDisplayFunc, glutGet, glutInit, glutInitDisplayMode, \
@@ -18,7 +18,7 @@ from numpy.linalg import norm, inv
 from scene import Scene
 from interaction import Interaction
 from primitive import init_primitives, G_OBJ_PLANE
-from node import Sphere, Cube, SnowFigure
+from node import Sphere, Cube, SnowFigure, SnowFigure1
 from scene import Scene
 import color
 
@@ -32,6 +32,7 @@ class Viewer(object):
         self.init_scene()
         self.init_interaction()
         init_primitives()
+        self.objects = []
 
     def init_interface(self):
         """ initialize the window and register the render function """
@@ -78,6 +79,7 @@ class Viewer(object):
         self.scene.add_node(sphere_node)
 
         hierarchical_node = SnowFigure()
+        hierarchical_node = SnowFigure1()
         for child_node in hierarchical_node.child_nodes:
             child_node.color_indx = color.MIN_COLOR
         hierarchical_node.translate(-2, 0, -2)
@@ -91,6 +93,8 @@ class Viewer(object):
         self.interaction.register_callback('place', self.place)
         self.interaction.register_callback('rotate_color', self.rotate_color)
         self.interaction.register_callback('scale', self.scale)
+        self.interaction.register_callback('delete', self.delete_object)
+
 
     def main_loop(self):
         glutMainLoop()
@@ -114,6 +118,10 @@ class Viewer(object):
         currentModelView = numpy.array(glGetFloatv(GL_MODELVIEW_MATRIX))
         self.modelView = numpy.transpose(currentModelView)
         self.inverseModelView = inv(numpy.transpose(currentModelView))
+        
+    
+
+        
 
         # render the scene. This will call the render function for each object in the scene
         self.scene.render()
@@ -138,6 +146,8 @@ class Viewer(object):
         glViewport(0, 0, xSize, ySize)
         gluPerspective(70, aspect_ratio, 0.1, 1000.0)
         glTranslated(0, 0, -15)
+        
+    
 
     def get_ray(self, x, y):
         """ Generate a ray beginning at the near plane, in the direction that the x, y coordinates are facing
@@ -180,6 +190,23 @@ class Viewer(object):
     def scale(self, up):
         """ Scale the selected Node. Boolean up indicates scaling larger."""
         self.scene.scale_selected(up)
+        
+    def delete_object(self, x, y):
+        """ Delete an object at the given x, y position """
+
+        obj = self.get_object_at_position(x, y)
+        if obj is not None:
+            self.objects.remove(obj)   
+            
+            
+    def add_object(self, obj):
+        self.objects.append(obj)        
+            
+    def get_object_at_position(self, x, y):
+        for obj in self.objects:
+            if obj.contains_point(x, y):
+                return obj
+        return None              
 
 
 if __name__ == "__main__":

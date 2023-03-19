@@ -13,6 +13,10 @@ class Interaction(object):
         """handle user interactions"""
 
         self.pressed = None
+        
+        self.window = window
+        self.rotation = [0.0, 0.0, 0.0]
+        self.translation = [0.0, 0.0, -5.0]
 
         self.translation = [0, 0, 0, 0]
 
@@ -32,6 +36,7 @@ class Interaction(object):
         glutMotionFunc(self.handle_mouse_move)
         glutKeyboardFunc(self.handle_keystroke)
         glutSpecialFunc(self.handle_keystroke)
+        glutSpecialFunc(self.handle_key_rotation)
 
 
     def register_callback(self, name, func):
@@ -74,7 +79,7 @@ class Interaction(object):
                 self.translate(0, 0, -1.0)
             case _:
                 self.pressed = None
-        glutPostRedisplay() # glutPostRedisplay is called when the window is redrawn
+        glutPostRedisplay() 
 
 
     def handle_mouse_move(self, x, screen_y):
@@ -82,7 +87,8 @@ class Interaction(object):
 
         xSize, ySize = glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT)
         #* invert the y coordinate because OpenGL is inverted
-        y = ySize - screen_y;    
+        y = ySize - screen_y; 
+       
 
         if self.pressed is not None:
             dx = x - self.mouse_loc[0]
@@ -93,7 +99,7 @@ class Interaction(object):
             elif self.pressed == GLUT_LEFT_BUTTON:
                 self.trigger('move', x, y)
             elif self.pressed == GLUT_MIDDLE_BUTTON:
-                self.translate(dx/60.0, dy/60.0)    
+                self.translate(dx/60.0, dy/60.0, 0)    
             else:
                 pass        
             glutPostRedisplay()
@@ -106,9 +112,9 @@ class Interaction(object):
         # invert the y coordinate because OpenGL is inverted
         y = ySize - screen_y;  
 
-        if key == 's':
+        if key == ord('s'):
             self.trigger('place', 'sphere', x, y)
-        elif key == 'c':
+        elif key == ord('c'):
             self.trigger('place', 'cube', x, y)
         elif key == GLUT_KEY_UP:
             self.trigger('scale', up=True)
@@ -119,6 +125,16 @@ class Interaction(object):
         elif key == GLUT_KEY_RIGHT:
             self.trigger('rotate_color', forward=False)
         glutPostRedisplay() 
+        
+        
+    def handle_key_rotation(self, key, x, y, step):
+        if key == b"x":
+            self.rotation[0] += step
+        elif key == b"y":
+            self.rotation[1] += step
+        elif key == b"z":
+            self.rotation[2] += step
+        glutPostRedisplay()
 
 
     

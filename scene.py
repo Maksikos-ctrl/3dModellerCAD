@@ -1,7 +1,7 @@
 import sys
 import numpy
-from node import Sphere, Cube, SnowFigure
-
+from node import Sphere, Cube, SnowFigure, SnowFigure1, Node
+import OpenGL.GL as gl
 
 
 class Scene(object):
@@ -22,7 +22,9 @@ class Scene(object):
 
     def render(self):
         for node in self.node_list:
-            node.render() 
+            node.render()
+            
+           
 
 
     def pick(self, start, direction, mat):
@@ -109,6 +111,7 @@ class Scene(object):
         if shape == 'sphere': new_node = Sphere()
         elif shape == 'cube': new_node = Cube()
         elif shape == 'figure': new_node = SnowFigure()
+        elif shape == 'figure1': new_node = SnowFigure1()
 
         self.add_node(new_node)
 
@@ -130,8 +133,8 @@ class Scene(object):
         """ Scale the current selection """
         if self.selected_node is None: return
         self.selected_node.scale(up)
-    
-            
+        
+   
 
 
 

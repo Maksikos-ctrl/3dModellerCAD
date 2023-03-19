@@ -3,41 +3,54 @@ from unittest.mock import MagicMock, patch
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from main import Viewer
-from scene import Scene
+from scene import Scene, Cube, Sphere, SnowFigure, SnowFigure1,  Node
+import numpy
 
-class TestViewer(unittest.TestCase):
+
+
+class TestScene(unittest.TestCase):
 
     def setUp(self):
-        self.viewer = Viewer()
+        self.scene = Scene()
+        self.cube = Cube()
+        self.sphere = Sphere()
+        self.snow_figure = SnowFigure()
+        self.snow_figure = SnowFigure1()
+
+    def test_add_node(self):
+        self.assertEqual(len(self.scene.node_list), 0)
+        self.scene.add_node(self.cube)
+        self.assertEqual(len(self.scene.node_list), 1)
+        self.assertEqual(self.scene.node_list[0], self.cube)
+
+    def test_render(self):
+        with patch.object(Node, 'render', return_value=None) as mock_render:
+            self.scene.node_list = [self.cube, self.sphere, self.snow_figure]
+            self.scene.render()
+            self.assertEqual(mock_render.call_count, 3)
+            
+    def test_pick_no_hit(self):
+        
+        self.assertIsNone(self.scene.selected_node)
 
 
-    def test_init_interface(self):
-        with patch('OpenGL.GLUT.glutInit') as glutInit:
-            self.viewer.init_interface()
-            glutInit.assert_called_once_with()
+    def test_pick_hit(self):
+        start = numpy.array([0, 0, 0])
+        direction = numpy.array([0, 0, -1])
+        mat = numpy.identity(4)
+        self.cube.pick = MagicMock(return_value=(True, 10))
+        self.sphere.pick = MagicMock(return_value=(False, 0))
+        self.snow_figure.pick = MagicMock(return_value=(True, 5))
+        self.scene.node_list = [self.cube, self.sphere, self.snow_figure]
+        self.assertIsNone(self.scene.selected_node)
+        self.scene.pick(start, direction, mat)
+        self.assertEqual(self.scene.selected_node, self.snow_figure)
+        self.snow_figure.pick.assert_called_once_with(start, direction, mat)
+        self.cube.pick.assert_called_once_with(start, direction, mat)
+        self.sphere.pick.assert_called_once_with(start, direction, mat)
 
-
-    def test_init_opengl(self):
-        with patch('OpenGL.GL.glEnable') as glEnable, \
-                patch('OpenGL.GL.glClearColor') as glClearColor, \
-                patch('OpenGL.GL.glMatrixMode') as glMatrixMode, \
-                patch('OpenGL.GL.glLoadIdentity') as glLoadIdentity, \
-                patch('OpenGL.GLU.gluOrtho2D') as gluOrtho2D:
-            self.viewer.init_opengl()
-            glEnable.assert_called_once_with(GL_CULL_FACE)
-            glClearColor.assert_called_once_with(0.0, 0.0, 0.0, 0.0)
-            glMatrixMode.assert_called_once_with(GL_PROJECTION)
-            glLoadIdentity.assert_called_once_with()
-            gluOrtho2D.assert_called_once_with(0, 640, 0, 480)
-
-
-    def test_create_sample_scene(self):
-        self.viewer.scene = Scene()
-        self.viewer.create_sample_scene()
-        self.assertEqual(len(self.viewer.scene.node_list), 3)
-
-     
    
+
 
 if __name__ == '__main__':
     unittest.main()
