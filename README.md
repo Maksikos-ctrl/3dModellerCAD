@@ -31,7 +31,7 @@ pip install pyopengl
 To run the program, execute the following command:
 
 ```
-python viewer.py
+python main.py
 ```
 
 This will open a window displaying the 3D scene. You can interact with the scene using the following mouse actions:
@@ -45,7 +45,7 @@ This will open a window displaying the 3D scene. You can interact with the scene
 The scene contains basic geometric shapes such as spheres and cubes. You can add more shapes by modifying the node.py file. The transformation.py file contains functions to create transformation matrices such as translation and scaling matrices that can be used to transform the objects in the scene.    
 
 
-`viewer.py`:
+`main.py`:
 
     This is the main Python file that launches the 3D model viewer.
     It creates an instance of the Scene class, which represents the 3D scene containing various geometric shapes.
